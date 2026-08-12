@@ -1,0 +1,697 @@
+﻿@using System
+@using System.Linq
+@using System.Collections.Generic
+@using System.Web.Mvc
+@using HayvanTakip.Entities
+
+
+@model List<HayvanTakip.Entities.Hayvan>
+
+@{
+    ViewBag.Title = "Hayvanlar";
+
+    var mevcutAction = ViewContext.RouteData.Values["action"] != null
+        ? ViewContext.RouteData.Values["action"].ToString()
+        : "";
+
+    var seciliCinsiyet = Request.QueryString["cinsiyet"];
+    var seciliDurum = Request.QueryString["durum"];
+
+    var cinsiyetListesi = Enum
+        .GetValues(typeof(HayvanCinsiyeti))
+        .Cast<HayvanCinsiyeti>()
+        .Select(x => new SelectListItem
+        {
+            Text = x.ToString(),
+            Value = Convert.ToInt32(x).ToString(),
+            Selected = Convert.ToInt32(x).ToString() == seciliCinsiyet
+        })
+        .ToList();
+
+    var durumListesi = Enum
+        .GetValues(typeof(HayvanDurumu))
+        .Cast<HayvanDurumu>()
+        .Select(x => new SelectListItem
+        {
+            Text = x.ToString(),
+            Value = Convert.ToInt32(x).ToString(),
+            Selected = Convert.ToInt32(x).ToString() == seciliDurum
+        })
+        .ToList();
+}
+
+<style>
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .page-title {
+        margin: 0;
+        color: #263238;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .page-description {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #78909c;
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+
+        .btn-add .glyphicon {
+            margin-right: 6px;
+        }
+
+    .record-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #dfe5e9;
+    }
+
+    .record-tab {
+        display: inline-block;
+        padding: 11px 16px;
+        margin-right: 5px;
+        color: #607d8b;
+        text-decoration: none;
+        border-bottom: 3px solid transparent;
+    }
+
+        .record-tab:hover,
+        .record-tab:focus {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        .record-tab.active {
+            color: #337ab7;
+            font-weight: 600;
+            border-bottom-color: #337ab7;
+        }
+
+        .record-tab .glyphicon {
+            margin-right: 5px;
+        }
+
+    .filter-card {
+        margin-bottom: 20px;
+        padding: 18px;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .filter-title {
+        margin-bottom: 17px;
+        color: #455a64;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+        .filter-title .glyphicon {
+            margin-right: 6px;
+        }
+
+    .filter-card label {
+        color: #455a64;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .filter-actions {
+        padding-top: 25px;
+        white-space: nowrap;
+    }
+
+        .filter-actions .btn {
+            margin-right: 4px;
+        }
+
+    .table-card {
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .hayvan-table {
+        margin-bottom: 0;
+    }
+
+        .hayvan-table thead {
+            background-color: #f0f4f7;
+        }
+
+        .hayvan-table th {
+            color: #455a64;
+            font-weight: 600;
+        }
+
+        .hayvan-table th,
+        .hayvan-table td {
+            padding: 12px !important;
+            vertical-align: middle !important;
+        }
+
+    .action-cell {
+        width: 160px;
+        white-space: nowrap;
+    }
+
+        .action-cell .btn,
+        .action-cell form {
+            display: inline-block;
+            margin-right: 3px;
+            vertical-align: middle;
+        }
+
+    .action-button {
+        width: 35px;
+        height: 33px;
+        padding: 6px 8px;
+        border-radius: 5px;
+    }
+
+    .status-label {
+        display: inline-block;
+        min-width: 70px;
+        padding: 5px 9px;
+        text-align: center;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+    }
+
+    .status-passive {
+        color: #c62828;
+        background-color: #ffebee;
+    }
+
+    .status-other {
+        color: #6d4c41;
+        background-color: #efebe9;
+    }
+
+    .empty-message {
+        padding: 30px !important;
+        color: #78909c;
+        text-align: center;
+    }
+
+    .modal-detail-table th {
+        width: 35%;
+        background-color: #f5f7f8;
+    }
+
+    @@media (max-width: 991px) {
+        .filter-actions {
+            padding-top: 0;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-header-row {
+            display: block;
+        }
+
+        .btn-add {
+            margin-top: 14px;
+        }
+
+        .record-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        @TempData["Error"]
+    </div>
+}
+
+<div class="page-header-row">
+
+    <div>
+        <h2 class="page-title">Hayvanlar</h2>
+
+        <p class="page-description">
+            Hayvan kayıtlarını görüntüleyebilir, filtreleyebilir ve yönetebilirsiniz.
+        </p>
+    </div>
+
+    <div>
+        <a href="@Url.Action("Create", "Hayvan")"
+           class="btn btn-success btn-add">
+
+            <span class="glyphicon glyphicon-plus"></span>
+            Yeni Hayvan
+        </a>
+    </div>
+
+</div>
+
+<div class="record-tabs">
+
+    <a href="@Url.Action("GetAktif", "Hayvan")"
+       class="record-tab @(mevcutAction == "GetAktif" || mevcutAction == "Index" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-ok-circle"></span>
+        Aktif Veriler
+    </a>
+
+    <a href="@Url.Action("GetPasif", "Hayvan")"
+       class="record-tab @(mevcutAction == "GetPasif" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-ban-circle"></span>
+        Pasif Veriler
+    </a>
+
+    <a href="@Url.Action("TumVeriler", "Hayvan")"
+       class="record-tab @(mevcutAction == "TumVeriler" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-list-alt"></span>
+        Tüm Veriler
+    </a>
+
+</div>
+
+<div class="filter-card">
+
+    <div class="filter-title">
+        <span class="glyphicon glyphicon-filter"></span>
+        Arama ve Filtreleme
+    </div>
+
+    @using (Html.BeginForm("Index", "Hayvan", FormMethod.Get))
+    {
+        <div class="row">
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                    <label>Küpe Numarası</label>
+
+                    <input type="text"
+                           name="kupeNo"
+                           value="@Request.QueryString["kupeNo"]"
+                           class="form-control"
+                           placeholder="Örn: TR-001" />
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                    <label>Tür</label>
+
+                    <input type="text"
+                           name="tur"
+                           value="@Request.QueryString["tur"]"
+                           class="form-control"
+                           placeholder="Örn: Sığır" />
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+                    <label>Irk</label>
+
+                    <input type="text"
+                           name="irk"
+                           value="@Request.QueryString["irk"]"
+                           class="form-control"
+                           placeholder="Örn: Holstein" />
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+                    <label>İşletme</label>
+
+                    @Html.DropDownList(
+                        "isletmeId",
+                        ViewBag.Isletmeler as SelectList,
+                        "Tüm İşletmeler",
+                        new { @class = "form-control" }
+                    )
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+                    <label>Cinsiyet</label>
+
+                    @Html.DropDownList(
+                        "cinsiyet",
+                        cinsiyetListesi,
+                        "Tümü",
+                        new { @class = "form-control" }
+                    )
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+                    <label>Durum</label>
+
+                    @Html.DropDownList(
+                        "durum",
+                        durumListesi,
+                        "Tümü",
+                        new { @class = "form-control" }
+                    )
+                </div>
+            </div>
+
+            <div class="col-md-9 col-sm-6">
+                <div class="filter-actions">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <span class="glyphicon glyphicon-search"></span>
+                        🔍
+                        Ara
+                    </button>
+
+                    <a href="@Url.Action("Index", "Hayvan")"
+                       class="btn btn-default">
+
+                        <span class="glyphicon glyphicon-refresh"></span>
+                        Temizle
+                    </a>
+
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<div class="table-card">
+
+    <div class="table-responsive">
+
+        <table class="table table-hover hayvan-table">
+
+            <thead>
+                <tr>
+                    <th>Küpe No</th>
+                    <th>Tür</th>
+                    <th>Irk</th>
+                    <th>Cinsiyet</th>
+                    <th>Doğum Tarihi</th>
+                    <th>Durum</th>
+                    <th>İşletme</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var hayvan in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <strong>@hayvan.KupeNo</strong>
+                            </td>
+
+                            <td>@hayvan.Tur</td>
+
+                            <td>@hayvan.Irk</td>
+
+                            <td>@hayvan.Cinsiyet</td>
+
+                            <td>
+                                @hayvan.DogumTarihi.ToString("dd.MM.yyyy")
+                            </td>
+
+                            <td>
+                                @if (hayvan.Durum == HayvanDurumu.Aktif)
+                                {
+                                    <span class="status-label status-active">
+                                        @hayvan.Durum
+                                    </span>
+                                }
+                                else if (hayvan.Durum == HayvanDurumu.Pasif)
+                                {
+                                    <span class="status-label status-passive">
+                                        @hayvan.Durum
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-label status-other">
+                                        @hayvan.Durum
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (hayvan.Isletme != null)
+                                {
+                                    @hayvan.Isletme.IsletmeAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        İşletme bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="action-cell">
+
+                                <button type="button"
+                                        class="btn btn-info btn-sm action-button btn-detay"
+                                        title="Detay"
+                                        data-id="@hayvan.Id"
+                                        data-kupeno="@hayvan.KupeNo"
+                                        data-tur="@hayvan.Tur"
+                                        data-irk="@hayvan.Irk"
+                                        data-cinsiyet="@hayvan.Cinsiyet"
+                                        data-dogum="@hayvan.DogumTarihi.ToString("dd.MM.yyyy")"
+                                        data-durum="@hayvan.Durum"
+                                        data-isletme="@(hayvan.Isletme != null
+                                            ? hayvan.Isletme.IsletmeAdi
+                                            : "İşletme bulunamadı")"
+                                        data-kayit="@hayvan.KayitTarihi.ToString("dd.MM.yyyy HH:mm")">
+                                    👁
+
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </button>
+
+                                <a href="@Url.Action(
+                                             "Edit",
+                                             "Hayvan",
+                                             new { id = hayvan.Id })"
+                                   class="btn btn-warning btn-sm action-button"
+                                   title="Güncelle">
+                                    ✏️
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+
+                                @if (hayvan.Durum == HayvanDurumu.Aktif)
+                                {
+                                    <a href="@Url.Action(
+                                                 "PasifAl",
+                                                 "Hayvan",
+                                                 new { id = hayvan.Id })"
+                                       class="btn btn-danger btn-sm action-button"
+                                       title="Pasife Al"
+                                       onclick="return confirm('Bu hayvanı pasife almak istediğinize emin misiniz?');">
+                                        🗑
+                                        <span class="glyphicon glyphicon-ban-circle"></span>
+                                    </a>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8"
+                            class="empty-message">
+
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Arama kriterlerine uygun hayvan kaydı bulunamadı.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="hayvanDetayModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="hayvanDetayBaslik">
+
+    <div class="modal-dialog"
+         role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Kapat">
+
+                    <span aria-hidden="true">
+                        &times;
+                    </span>
+                </button>
+
+                <h4 class="modal-title"
+                    id="hayvanDetayBaslik">
+
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Hayvan Detayı
+                </h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered modal-detail-table">
+
+                    <tbody>
+
+                        <tr>
+                            <th>Id</th>
+                            <td id="detayId"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Küpe Numarası</th>
+                            <td id="detayKupeNo"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Tür</th>
+                            <td id="detayTur"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Irk</th>
+                            <td id="detayIrk"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Cinsiyet</th>
+                            <td id="detayCinsiyet"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Doğum Tarihi</th>
+                            <td id="detayDogum"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Durum</th>
+                            <td id="detayDurum"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İşletme</th>
+                            <td id="detayIsletme"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kayıt Tarihi</th>
+                            <td id="detayKayit"></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Kapat
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $(".btn-detay").click(function () {
+
+                var buton = $(this);
+
+                $("#detayId").text(buton.attr("data-id"));
+                $("#detayKupeNo").text(buton.attr("data-kupeno"));
+                $("#detayTur").text(buton.attr("data-tur"));
+                $("#detayIrk").text(buton.attr("data-irk"));
+                $("#detayCinsiyet").text(buton.attr("data-cinsiyet"));
+                $("#detayDogum").text(buton.attr("data-dogum"));
+                $("#detayDurum").text(buton.attr("data-durum"));
+                $("#detayIsletme").text(buton.attr("data-isletme"));
+                $("#detayKayit").text(buton.attr("data-kayit"));
+
+                $("#hayvanDetayModal").modal("show");
+            });
+
+        });
+    </script>
+}

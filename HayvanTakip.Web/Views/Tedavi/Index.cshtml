@@ -1,0 +1,477 @@
+﻿@using System
+@using System.Linq
+@model List<HayvanTakip.Entities.Tedavi>
+
+@{
+    ViewBag.Title = "Tedaviler";
+}
+
+<style>
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        margin: 0;
+        color: #263238;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .page-description {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #78909c;
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+    .table-card {
+        overflow: hidden;
+        background-color: #fff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,.04);
+    }
+
+    .tedavi-table {
+        margin-bottom: 0;
+    }
+
+        .tedavi-table thead {
+            background-color: #f0f4f7;
+        }
+
+        .tedavi-table th {
+            color: #455a64;
+            font-weight: 600;
+        }
+
+        .tedavi-table th,
+        .tedavi-table td {
+            padding: 12px !important;
+            vertical-align: middle !important;
+        }
+
+    .status-label {
+        display: inline-block;
+        min-width: 90px;
+        padding: 5px 9px;
+        text-align: center;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        color: #ef6c00;
+        background-color: #fff3e0;
+    }
+
+    .status-finished {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+    }
+
+    .action-cell {
+        width: 130px;
+        white-space: nowrap;
+    }
+
+    .action-button {
+        width: 35px;
+        height: 33px;
+        padding: 6px 8px;
+        margin-right: 3px;
+        border-radius: 5px;
+    }
+
+    .empty-message {
+        padding: 30px !important;
+        color: #78909c;
+        text-align: center;
+    }
+
+    .modal-detail-table th {
+        width: 35%;
+        background-color: #f5f7f8;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header-row {
+            display: block;
+        }
+
+        .btn-add {
+            margin-top: 14px;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        @TempData["Error"]
+    </div>
+}
+
+<div class="page-header-row">
+
+    <div>
+        <h2 class="page-title">Tedaviler</h2>
+
+        <p class="page-description">
+            Hastalıklara uygulanan tedavi ve ilaç kayıtlarını yönetebilirsiniz.
+        </p>
+    </div>
+
+    <div>
+        <a href="@Url.Action("Create", "Tedavi")"
+           class="btn btn-success btn-add">
+
+            <span class="glyphicon glyphicon-plus"></span>
+            Yeni Tedavi
+        </a>
+    </div>
+
+</div>
+
+<div class="table-card">
+
+    <div class="table-responsive">
+
+        <table class="table table-hover tedavi-table">
+
+            <thead>
+                <tr>
+                    <th>Küpe No</th>
+                    <th>Hastalık</th>
+                    <th>Tedavi</th>
+                    <th>İlaç</th>
+                    <th>Başlangıç</th>
+                    <th>Bitiş</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var tedavi in Model)
+                    {
+                        var devamEdiyor =
+                            !tedavi.BitisTarihi.HasValue ||
+                            tedavi.BitisTarihi.Value.Date >= DateTime.Today;
+
+                        <tr>
+
+                            <td>
+                                @if (tedavi.Hastalik != null &&
+                                     tedavi.Hastalik.Hayvan != null)
+                                {
+                                    <strong>
+                                        @tedavi.Hastalik.Hayvan.KupeNo
+                                    </strong>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Hayvan bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (tedavi.Hastalik != null)
+                                {
+                                    @tedavi.Hastalik.HastalikAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Hastalık bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @tedavi.TedaviAdi
+                            </td>
+
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(tedavi.IlacAdi))
+                                {
+                                    @tedavi.IlacAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">Belirtilmedi</span>
+                                }
+                            </td>
+
+                            <td>
+                                @tedavi.BaslangicTarihi.ToString("dd.MM.yyyy")
+                            </td>
+
+                            <td>
+                                @if (tedavi.BitisTarihi.HasValue)
+                                {
+                                    @tedavi.BitisTarihi.Value.ToString("dd.MM.yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Belirtilmedi
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (devamEdiyor)
+                                {
+                                    <span class="status-label status-active">
+                                        Devam Ediyor
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-label status-finished">
+                                        Tamamlandı
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="action-cell">
+
+                                <button type="button"
+                                        class="btn btn-info btn-sm action-button btn-detay"
+                                        title="Detay"
+                                        data-id="@tedavi.Id"
+                                        data-kupeno="@(tedavi.Hastalik != null &&
+                                                        tedavi.Hastalik.Hayvan != null
+                                            ? tedavi.Hastalik.Hayvan.KupeNo
+                                            : "Hayvan bulunamadı")"
+                                        data-hastalik="@(tedavi.Hastalik != null
+                                            ? tedavi.Hastalik.HastalikAdi
+                                            : "Hastalık bulunamadı")"
+                                        data-tedavi="@tedavi.TedaviAdi"
+                                        data-ilac="@(string.IsNullOrWhiteSpace(tedavi.IlacAdi)
+                                            ? "Belirtilmedi"
+                                            : tedavi.IlacAdi)"
+                                        data-baslangic="@tedavi.BaslangicTarihi.ToString("dd.MM.yyyy")"
+                                        data-bitis="@(tedavi.BitisTarihi.HasValue
+                                            ? tedavi.BitisTarihi.Value.ToString("dd.MM.yyyy")
+                                            : "Belirtilmedi")"
+                                        data-doz="@(string.IsNullOrWhiteSpace(tedavi.DozBilgisi)
+                                            ? "Belirtilmedi"
+                                            : tedavi.DozBilgisi)"
+                                        data-aciklama="@(string.IsNullOrWhiteSpace(tedavi.Aciklama)
+                                            ? "Açıklama yok"
+                                            : tedavi.Aciklama)"
+                                        data-kayit="@tedavi.KayitTarihi.ToString("dd.MM.yyyy HH:mm")">
+                                    👁
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </button>
+
+                                <a href="@Url.Action("Edit", "Tedavi",
+                                             new { id = tedavi.Id })"
+                                   class="btn btn-warning btn-sm action-button"
+                                   title="Güncelle">
+                                    ✏️
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+
+                                @using (Html.BeginForm(
+                                    "Delete",
+                                    "Tedavi",
+                                    new { id = tedavi.Id },
+                                    FormMethod.Post,
+                                    new
+                                    {
+                                        style = "display:inline-block; margin:0;",
+                                        onsubmit = "return confirm('Bu tedavi kaydını silmek istediğinize emin misiniz?');"
+                                    }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-danger btn-sm action-button"
+                                    title="Sil">
+                                🗑
+                                <span class="glyphicon glyphicon-trash"></span>
+                            </button>
+                                }
+
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8"
+                            class="empty-message">
+
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Henüz tedavi kaydı bulunmuyor.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="tedaviDetayModal"
+     tabindex="-1"
+     role="dialog">
+
+    <div class="modal-dialog"
+         role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+                </button>
+
+                <h4 class="modal-title">
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Tedavi Detayı
+                </h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered modal-detail-table">
+                    <tbody>
+
+                        <tr>
+                            <th>Id</th>
+                            <td id="detayId"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Küpe No</th>
+                            <td id="detayKupeNo"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Hastalık</th>
+                            <td id="detayHastalik"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Tedavi</th>
+                            <td id="detayTedavi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İlaç</th>
+                            <td id="detayIlac"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Başlangıç Tarihi</th>
+                            <td id="detayBaslangic"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Bitiş Tarihi</th>
+                            <td id="detayBitis"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Doz Bilgisi</th>
+                            <td id="detayDoz"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Açıklama</th>
+                            <td id="detayAciklama"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kayıt Tarihi</th>
+                            <td id="detayKayit"></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Kapat
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $(".btn-detay").click(function () {
+
+                var buton = $(this);
+
+                $("#detayId").text(buton.attr("data-id"));
+                $("#detayKupeNo").text(buton.attr("data-kupeno"));
+                $("#detayHastalik").text(buton.attr("data-hastalik"));
+                $("#detayTedavi").text(buton.attr("data-tedavi"));
+                $("#detayIlac").text(buton.attr("data-ilac"));
+                $("#detayBaslangic").text(buton.attr("data-baslangic"));
+                $("#detayBitis").text(buton.attr("data-bitis"));
+                $("#detayDoz").text(buton.attr("data-doz"));
+                $("#detayAciklama").text(buton.attr("data-aciklama"));
+                $("#detayKayit").text(buton.attr("data-kayit"));
+
+                $("#tedaviDetayModal").modal("show");
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,566 @@
+﻿@using System.Linq
+@model List<HayvanTakip.Entities.Isletme>
+
+@{
+    ViewBag.Title = "İşletmeler";
+    var mevcutAction = ViewContext.RouteData.Values["action"]?.ToString();
+}
+
+<style>
+    body {
+        background-color: #f5f7fa;
+    }
+
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        margin: 0;
+        font-size: 28px;
+        font-weight: 600;
+        color: #263238;
+    }
+
+    .page-description {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #78909c;
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+        .btn-add .glyphicon {
+            margin-right: 6px;
+        }
+
+    .record-tabs {
+        display: flex;
+        margin-bottom: 18px;
+        border-bottom: 1px solid #dfe5e9;
+    }
+
+    .record-tab {
+        display: inline-block;
+        padding: 10px 16px;
+        margin-right: 8px;
+        color: #607d8b;
+        text-decoration: none;
+        border-bottom: 3px solid transparent;
+    }
+
+        .record-tab:hover,
+        .record-tab:focus {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        .record-tab.active {
+            color: #337ab7;
+            font-weight: 600;
+            border-bottom-color: #337ab7;
+        }
+
+        .record-tab .glyphicon {
+            margin-right: 5px;
+        }
+
+    .filter-card,
+    .table-card {
+        background: #ffffff;
+        border: 1px solid #e2e8ec;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .filter-card {
+        padding: 18px;
+        margin-bottom: 20px;
+    }
+
+    .filter-card-title {
+        margin-bottom: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        color: #455a64;
+    }
+
+        .filter-card-title .glyphicon {
+            margin-right: 6px;
+        }
+
+    .filter-actions {
+        padding-top: 25px;
+        white-space: nowrap;
+    }
+
+        .filter-actions .btn {
+            margin-right: 4px;
+        }
+
+    .table-card {
+        overflow: hidden;
+    }
+
+    .business-table {
+        margin-bottom: 0;
+    }
+
+        .business-table thead {
+            background-color: #f0f4f7;
+        }
+
+            .business-table thead th {
+                color: #455a64;
+                font-weight: 600;
+                border-bottom: 1px solid #dbe3e8;
+            }
+
+        .business-table td,
+        .business-table th {
+            vertical-align: middle !important;
+            padding: 12px !important;
+        }
+
+    .action-cell {
+        width: 160px;
+        white-space: nowrap;
+    }
+
+    .action-button {
+        width: 34px;
+        height: 32px;
+        padding: 6px 8px;
+        margin-right: 3px;
+        border-radius: 5px;
+    }
+
+    .status-label {
+        display: inline-block;
+        min-width: 54px;
+        padding: 5px 8px;
+        border-radius: 12px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+    }
+
+    .status-passive {
+        color: #c62828;
+        background-color: #ffebee;
+    }
+
+    .empty-row {
+        padding: 30px !important;
+        color: #78909c;
+    }
+
+    .modal-detail-table th {
+        width: 35%;
+        background-color: #f7f9fa;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header-row {
+            display: block;
+        }
+
+        .btn-add {
+            margin-top: 14px;
+        }
+
+        .record-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .filter-actions {
+            padding-top: 0;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        @TempData["Error"]
+    </div>
+}
+
+<div class="page-header-row">
+    <div>
+        <h2 class="page-title">İşletmeler</h2>
+
+        <p class="page-description">
+            İşletme kayıtlarını görüntüleyebilir, filtreleyebilir ve yönetebilirsiniz.
+        </p>
+    </div>
+
+    <div>
+        <a href="@Url.Action("Create", "Isletme")"
+           class="btn btn-success btn-add">
+
+            <span class="glyphicon glyphicon-plus"></span>
+            Yeni İşletme
+        </a>
+    </div>
+</div>
+
+<div class="record-tabs">
+    <a href="@Url.Action("Index", "Isletme")"
+       class="record-tab @(mevcutAction == "Index" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-ok-circle"></span>
+        Aktif Veriler
+    </a>
+
+    <a href="@Url.Action("Pasif", "Isletme")"
+       class="record-tab @(mevcutAction == "Pasif" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-list-alt"></span>
+        Tüm Veriler
+    </a>
+</div>
+
+<div class="filter-card">
+
+    <div class="filter-card-title">
+        <span class="glyphicon glyphicon-filter"></span>
+        Arama ve Filtreleme
+    </div>
+
+    @using (Html.BeginForm(mevcutAction ?? "Index", "Isletme", FormMethod.Get))
+    {
+        <div class="row">
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>İşletme Numarası</label>
+
+                    <input type="text"
+                           name="isletmeNo"
+                           value="@Request.QueryString["isletmeNo"]"
+                           class="form-control"
+                           placeholder="Örn: ANK-001" />
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>İşletme Adı</label>
+
+                    <input type="text"
+                           name="isletmeAdi"
+                           value="@Request.QueryString["isletmeAdi"]"
+                           class="form-control"
+                           placeholder="İşletme adı" />
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>İl Kodu</label>
+
+                    <input type="text"
+                           name="ilKodu"
+                           value="@Request.QueryString["ilKodu"]"
+                           class="form-control"
+                           placeholder="06" />
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="form-group">
+                    <label>Durum</label>
+
+                    <select name="aktifMi"
+                            class="form-control">
+
+                        <option value="">
+                            Tümü
+                        </option>
+
+                        <option value="true"
+                                @(Request.QueryString["aktifMi"] == "true" ? "selected" : null)>
+                            Aktif
+                        </option>
+
+                        <option value="false"
+                                @(Request.QueryString["aktifMi"] == "false" ? "selected" : null)>
+                            Pasif
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-2">
+                <div class="filter-actions">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <span class="glyphicon glyphicon-search"></span>
+                        Ara
+                    </button>
+
+                    <a href="@Url.Action(mevcutAction ?? "Index", "Isletme")"
+                       class="btn btn-default">
+                        Temizle
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+
+        <table class="table table-hover business-table">
+            <thead>
+                <tr>
+                    <th>İşletme No</th>
+                    <th>İşletme Adı</th>
+                    <th>İl Kodu</th>
+                    <th>İlçe Kodu</th>
+                    <th>Durum</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var isletme in Model)
+                    {
+                        <tr>
+                            <td>@isletme.IsletmeNo</td>
+                            <td>@isletme.IsletmeAdi</td>
+                            <td>@isletme.IlKodu</td>
+                            <td>@isletme.IlceKodu</td>
+
+                            <td>
+                                @if (isletme.AktifMi)
+                                {
+                                    <span class="status-label status-active">
+                                        Aktif
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="status-label status-passive">
+                                        Pasif
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="action-cell">
+
+                                <button type="button"
+                                        class="btn btn-info btn-sm action-button btn-detay"
+                                        title="Detay"
+                                        data-id="@isletme.Id"
+                                        data-isletmeno="@isletme.IsletmeNo"
+                                        data-isletmeadi="@isletme.IsletmeAdi"
+                                        data-ilkodu="@isletme.IlKodu"
+                                        data-ilcekodu="@isletme.IlceKodu"
+                                        data-adres="@isletme.Adres"
+                                        data-yetkilitckn="@isletme.YetkiliTckn"
+                                        data-aktifmi="@(isletme.AktifMi ? "Aktif" : "Pasif")"
+                                        data-kayittarihi="@isletme.KayitTarihi.ToString("dd.MM.yyyy HH:mm")">
+                                    👁
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </button>
+
+                                <a href="@Url.Action(
+                                             "Edit",
+                                             "Isletme",
+                                             new { id = isletme.Id })"
+                                   class="btn btn-warning btn-sm action-button"
+                                   title="Güncelle">
+                                    ✏️
+
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+
+                                @if (isletme.AktifMi)
+                                {
+                                    <a href="@Url.Action(
+                                                 "Delete",
+                                                 "Isletme",
+                                                 new { id = isletme.Id })"
+                                       class="btn btn-danger btn-sm action-button"
+                                       title="Pasife Al"
+                                       onclick="return confirm('Bu işletmeyi pasife almak istediğinize emin misiniz?');">
+
+                                        <span class="glyphicon glyphicon-ban-circle"></span>
+                                        🗑
+                                    </a>
+                                }
+
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="6"
+                            class="text-center empty-row">
+
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Kayıt bulunamadı.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="modal fade"
+     id="isletmeDetayModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="isletmeDetayBaslik">
+
+    <div class="modal-dialog"
+         role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Kapat">
+
+                    <span aria-hidden="true">
+                        &times;
+                    </span>
+                </button>
+
+                <h4 class="modal-title"
+                    id="isletmeDetayBaslik">
+
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    İşletme Detayı
+                </h4>
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered modal-detail-table">
+                    <tbody>
+                        <tr>
+                            <th>Id</th>
+                            <td id="detayId"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İşletme Numarası</th>
+                            <td id="detayIsletmeNo"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İşletme Adı</th>
+                            <td id="detayIsletmeAdi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İl Kodu</th>
+                            <td id="detayIlKodu"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İlçe Kodu</th>
+                            <td id="detayIlceKodu"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Adres</th>
+                            <td id="detayAdres"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Yetkili TCKN</th>
+                            <td id="detayYetkiliTckn"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Durum</th>
+                            <td id="detayAktifMi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kayıt Tarihi</th>
+                            <td id="detayKayitTarihi"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Kapat
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $(".btn-detay").click(function () {
+
+                var buton = $(this);
+
+                $("#detayId").text(buton.data("id"));
+                $("#detayIsletmeNo").text(buton.data("isletmeno"));
+                $("#detayIsletmeAdi").text(buton.data("isletmeadi"));
+                $("#detayIlKodu").text(buton.data("ilkodu"));
+                $("#detayIlceKodu").text(buton.data("ilcekodu"));
+                $("#detayAdres").text(buton.data("adres"));
+                $("#detayYetkiliTckn").text(buton.data("yetkilitckn"));
+                $("#detayAktifMi").text(buton.data("aktifmi"));
+                $("#detayKayitTarihi").text(buton.data("kayittarihi"));
+
+                $("#isletmeDetayModal").modal("show");
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,516 @@
+﻿@using System
+@using System.Linq
+@model List<HayvanTakip.Entities.Hareket>
+
+@{
+    ViewBag.Title = "Hayvan Hareketleri";
+}
+
+<style>
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .page-title {
+        margin: 0;
+        color: #263238;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .page-description {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #78909c;
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        border-radius: 6px;
+        font-weight: 600;
+    }
+
+    .table-card {
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .hareket-table {
+        margin-bottom: 0;
+    }
+
+        .hareket-table thead {
+            background-color: #f0f4f7;
+        }
+
+        .hareket-table th {
+            color: #455a64;
+            font-weight: 600;
+        }
+
+        .hareket-table th,
+        .hareket-table td {
+            padding: 12px !important;
+            vertical-align: middle !important;
+        }
+
+    .hareket-badge {
+        display: inline-block;
+        min-width: 78px;
+        padding: 5px 9px;
+        text-align: center;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .hareket-giris {
+        color: #2e7d32;
+        background-color: #e8f5e9;
+    }
+
+    .hareket-cikis {
+        color: #c62828;
+        background-color: #ffebee;
+    }
+
+    .hareket-sevk {
+        color: #ef6c00;
+        background-color: #fff3e0;
+    }
+
+    .hareket-transfer {
+        color: #1565c0;
+        background-color: #e3f2fd;
+    }
+
+    .action-cell {
+        width: 145px;
+        white-space: nowrap;
+    }
+
+    .emoji-btn {
+        display: inline-flex;
+        width: 37px;
+        height: 34px;
+        margin-right: 3px;
+        padding: 0;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 17px;
+        text-decoration: none !important;
+    }
+
+    .description-cell {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .empty-message {
+        padding: 30px !important;
+        color: #78909c;
+        text-align: center;
+    }
+
+    .modal-detail-table th {
+        width: 35%;
+        background-color: #f5f7f8;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header-row {
+            display: block;
+        }
+
+        .btn-add {
+            margin-top: 14px;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        ✅ @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        ❌ @TempData["Error"]
+    </div>
+}
+
+<div class="page-header-row">
+
+    <div>
+        <h2 class="page-title">
+            Hayvan Hareketleri
+        </h2>
+
+        <p class="page-description">
+            Hayvanların giriş, çıkış, sevk ve işletmeler arası transfer kayıtlarını yönetebilirsiniz.
+        </p>
+    </div>
+
+    <div>
+        <a href="@Url.Action("Create", "Hareket")"
+           class="btn btn-success btn-add">
+
+            ➕ Yeni Hareket
+        </a>
+    </div>
+
+</div>
+
+<div class="table-card">
+
+    <div class="table-responsive">
+
+        <table class="table table-hover hareket-table">
+
+            <thead>
+                <tr>
+                    <th>Küpe No</th>
+                    <th>Hareket Tipi</th>
+                    <th>Kaynak İşletme</th>
+                    <th>Hedef İşletme</th>
+                    <th>Hareket Tarihi</th>
+                    <th>Açıklama</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var hareket in Model)
+                    {
+                        var hareketClass = "";
+
+                        switch (hareket.HareketTipi)
+                        {
+                            case HayvanTakip.Entities.HareketTipi.Giris:
+                                hareketClass = "hareket-giris";
+                                break;
+
+                            case HayvanTakip.Entities.HareketTipi.Cikis:
+                                hareketClass = "hareket-cikis";
+                                break;
+
+                            case HayvanTakip.Entities.HareketTipi.Sevk:
+                                hareketClass = "hareket-sevk";
+                                break;
+
+                            case HayvanTakip.Entities.HareketTipi.Transfer:
+                                hareketClass = "hareket-transfer";
+                                break;
+                        }
+
+                        <tr>
+
+                            <td>
+                                @if (hareket.Hayvan != null)
+                                {
+                                    <strong>
+                                        @hareket.Hayvan.KupeNo
+                                    </strong>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Hayvan bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="hareket-badge @hareketClass">
+                                    @hareket.HareketTipi
+                                </span>
+                            </td>
+
+                            <td>
+                                @if (hareket.KaynakIsletme != null)
+                                {
+                                    @hareket.KaynakIsletme.IsletmeAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Belirtilmedi
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (hareket.HedefIsletme != null)
+                                {
+                                    @hareket.HedefIsletme.IsletmeAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Belirtilmedi
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @hareket.HareketTarihi.ToString("dd.MM.yyyy")
+                            </td>
+
+                            <td class="description-cell"
+                                title="@hareket.Aciklama">
+
+                                @if (!string.IsNullOrWhiteSpace(hareket.Aciklama))
+                                {
+                                    @hareket.Aciklama
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Açıklama yok
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="action-cell">
+
+                                <!-- DETAY -->
+                                <button type="button"
+                                        class="btn btn-info btn-sm emoji-btn btn-detay"
+                                        title="Detay"
+                                        data-id="@hareket.Id"
+                                        data-kupeno="@(hareket.Hayvan != null
+                                            ? hareket.Hayvan.KupeNo
+                                            : "Hayvan bulunamadı")"
+                                        data-tip="@hareket.HareketTipi"
+                                        data-kaynak="@(hareket.KaynakIsletme != null
+                                            ? hareket.KaynakIsletme.IsletmeAdi
+                                            : "Belirtilmedi")"
+                                        data-hedef="@(hareket.HedefIsletme != null
+                                            ? hareket.HedefIsletme.IsletmeAdi
+                                            : "Belirtilmedi")"
+                                        data-tarih="@hareket.HareketTarihi.ToString("dd.MM.yyyy")"
+                                        data-aciklama="@(string.IsNullOrWhiteSpace(hareket.Aciklama)
+                                            ? "Açıklama yok"
+                                            : hareket.Aciklama)"
+                                        data-kayit="@hareket.KayitTarihi.ToString("dd.MM.yyyy HH:mm")">
+
+                                    👁️
+                                </button>
+
+                                <!-- GÜNCELLE -->
+                                <a href="@Url.Action(
+                                             "Edit",
+                                             "Hareket",
+                                             new { id = hareket.Id })"
+                                   class="btn btn-warning btn-sm emoji-btn"
+                                   title="Güncelle">
+
+                                    ✏️
+                                </a>
+
+                                <!-- SİL -->
+                                @using (Html.BeginForm(
+                                    "Delete",
+                                    "Hareket",
+                                    new { id = hareket.Id },
+                                    FormMethod.Post,
+                                    new
+                                    {
+                                        style = "display:inline-block; margin:0;",
+                                        onsubmit = "return confirm('Bu hareket kaydını silmek istediğinize emin misiniz?');"
+                                    }))
+                                {
+                                    @Html.AntiForgeryToken()
+
+                                    <button type="submit"
+                                            class="btn btn-danger btn-sm emoji-btn"
+                                            title="Sil">
+
+                                        🗑️
+                                    </button>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="7"
+                            class="empty-message">
+
+                            ℹ️ Henüz hareket kaydı bulunmuyor.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- DETAY MODAL -->
+
+<div class="modal fade"
+     id="hareketDetayModal"
+     tabindex="-1"
+     role="dialog">
+
+    <div class="modal-dialog"
+         role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal">
+
+                    <span>&times;</span>
+                </button>
+
+                <h4 class="modal-title">
+                    👁️ Hareket Detayı
+                </h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered modal-detail-table">
+
+                    <tbody>
+
+                        <tr>
+                            <th>Id</th>
+                            <td id="detayId"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Küpe No</th>
+                            <td id="detayKupeNo"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Hareket Tipi</th>
+                            <td id="detayTip"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kaynak İşletme</th>
+                            <td id="detayKaynak"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Hedef İşletme</th>
+                            <td id="detayHedef"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Hareket Tarihi</th>
+                            <td id="detayTarih"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Açıklama</th>
+                            <td id="detayAciklama"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kayıt Tarihi</th>
+                            <td id="detayKayit"></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Kapat
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts
+{
+    <script>
+
+        $(document).ready(function () {
+
+            $(".btn-detay").click(function () {
+
+                var buton = $(this);
+
+                $("#detayId").text(
+                    buton.attr("data-id")
+                );
+
+                $("#detayKupeNo").text(
+                    buton.attr("data-kupeno")
+                );
+
+                $("#detayTip").text(
+                    buton.attr("data-tip")
+                );
+
+                $("#detayKaynak").text(
+                    buton.attr("data-kaynak")
+                );
+
+                $("#detayHedef").text(
+                    buton.attr("data-hedef")
+                );
+
+                $("#detayTarih").text(
+                    buton.attr("data-tarih")
+                );
+
+                $("#detayAciklama").text(
+                    buton.attr("data-aciklama")
+                );
+
+                $("#detayKayit").text(
+                    buton.attr("data-kayit")
+                );
+
+                $("#hareketDetayModal").modal("show");
+            });
+
+        });
+
+    </script>
+}

@@ -1,0 +1,704 @@
+﻿@using System
+@using System.Linq
+@model List<HayvanTakip.Entities.Asi>
+
+@{
+    ViewBag.Title = "Aşı Takibi";
+    var mevcutAction = ViewContext.RouteData.Values["action"] != null
+        ? ViewContext.RouteData.Values["action"].ToString()
+        : "";
+}
+
+<style>
+    .page-header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 18px;
+    }
+
+    .page-title {
+        margin: 0;
+        color: #263238;
+        font-size: 28px;
+        font-weight: 600;
+    }
+
+    .page-description {
+        margin-top: 6px;
+        margin-bottom: 0;
+        color: #78909c;
+    }
+
+    .btn-add {
+        padding: 10px 16px;
+        font-weight: 600;
+        border-radius: 6px;
+    }
+
+        .btn-add .glyphicon {
+            margin-right: 6px;
+        }
+
+    .record-tabs {
+        display: flex;
+        margin-bottom: 20px;
+        border-bottom: 1px solid #dfe5e9;
+    }
+
+    .record-tab {
+        display: inline-block;
+        padding: 11px 16px;
+        margin-right: 5px;
+        color: #607d8b;
+        text-decoration: none;
+        border-bottom: 3px solid transparent;
+    }
+
+        .record-tab:hover,
+        .record-tab:focus {
+            color: #337ab7;
+            text-decoration: none;
+        }
+
+        .record-tab.active {
+            color: #337ab7;
+            font-weight: 600;
+            border-bottom-color: #337ab7;
+        }
+
+        .record-tab .glyphicon {
+            margin-right: 5px;
+        }
+
+    .filter-card {
+        margin-bottom: 20px;
+        padding: 18px;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .filter-title {
+        margin-bottom: 17px;
+        color: #455a64;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+        .filter-title .glyphicon {
+            margin-right: 6px;
+        }
+
+    .filter-card label {
+        color: #455a64;
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    .filter-actions {
+        padding-top: 25px;
+        white-space: nowrap;
+    }
+
+        .filter-actions .btn {
+            margin-right: 4px;
+        }
+
+    .table-card {
+        overflow: hidden;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .asi-table {
+        margin-bottom: 0;
+    }
+
+        .asi-table thead {
+            background-color: #f0f4f7;
+        }
+
+        .asi-table th {
+            color: #455a64;
+            font-weight: 600;
+        }
+
+        .asi-table th,
+        .asi-table td {
+            padding: 12px !important;
+            vertical-align: middle !important;
+        }
+
+    .action-cell {
+        width: 120px;
+        white-space: nowrap;
+    }
+
+    .action-button {
+        width: 35px;
+        height: 33px;
+        padding: 6px 8px;
+        margin-right: 3px;
+        border-radius: 5px;
+    }
+
+    .status-label {
+        display: inline-block;
+        min-width: 82px;
+        padding: 5px 9px;
+        text-align: center;
+        border-radius: 14px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-planned {
+        color: #1565c0;
+        background-color: #e3f2fd;
+    }
+
+    .status-soon {
+        color: #ef6c00;
+        background-color: #fff3e0;
+    }
+
+    .status-late {
+        color: #c62828;
+        background-color: #ffebee;
+    }
+
+    .status-empty {
+        color: #616161;
+        background-color: #eeeeee;
+    }
+
+    .empty-message {
+        padding: 30px !important;
+        color: #78909c;
+        text-align: center;
+    }
+
+    .modal-detail-table th {
+        width: 35%;
+        background-color: #f5f7f8;
+    }
+
+    .description-cell {
+        max-width: 220px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    @@media (max-width: 991px) {
+        .filter-actions {
+            padding-top: 0;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .page-header-row {
+            display: block;
+        }
+
+        .btn-add {
+            margin-top: 14px;
+        }
+
+        .record-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+    }
+</style>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        <span class="glyphicon glyphicon-ok-sign"></span>
+        @TempData["Success"]
+    </div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        <span class="glyphicon glyphicon-exclamation-sign"></span>
+        @TempData["Error"]
+    </div>
+}
+
+<div class="page-header-row">
+
+    <div>
+        <h2 class="page-title">Aşı Takibi</h2>
+
+        <p class="page-description">
+            Hayvanların uygulanan ve planlanan aşı kayıtlarını yönetebilirsiniz.
+        </p>
+    </div>
+
+    <div>
+        <a href="@Url.Action("Create", "Asi")"
+           class="btn btn-success btn-add">
+
+            <span class="glyphicon glyphicon-plus"></span>
+            Yeni Aşı Kaydı
+        </a>
+    </div>
+
+</div>
+
+<div class="record-tabs">
+
+    <a href="@Url.Action("Index", "Asi")"
+       class="record-tab @(mevcutAction == "Index" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-list-alt"></span>
+        Tüm Aşılar
+    </a>
+
+    <a href="@Url.Action("Yaklasan", "Asi")"
+       class="record-tab @(mevcutAction == "Yaklasan" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-time"></span>
+        Yaklaşan Aşılar
+    </a>
+
+    <a href="@Url.Action("Geciken", "Asi")"
+       class="record-tab @(mevcutAction == "Geciken" ? "active" : "")">
+
+        <span class="glyphicon glyphicon-warning-sign"></span>
+        Geciken Aşılar
+    </a>
+
+</div>
+
+<div class="filter-card">
+
+    <div class="filter-title">
+        <span class="glyphicon glyphicon-filter"></span>
+        Arama ve Filtreleme
+    </div>
+
+    @using (Html.BeginForm("Index", "Asi", FormMethod.Get))
+    {
+        <div class="row">
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+
+                    <label>Küpe Numarası</label>
+
+                    <input type="text"
+                           name="kupeNo"
+                           value="@Request.QueryString["kupeNo"]"
+                           class="form-control"
+                           placeholder="Örn: TR-001" />
+
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+
+                    <label>Aşı Adı</label>
+
+                    <input type="text"
+                           name="asiAdi"
+                           value="@Request.QueryString["asiAdi"]"
+                           class="form-control"
+                           placeholder="Örn: Şap" />
+
+                </div>
+            </div>
+
+            <div class="col-md-3 col-sm-6">
+                <div class="form-group">
+
+
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+
+                    <label>Başlangıç Tarihi</label>
+
+                    <input type="date"
+                           name="baslangicTarihi"
+                           value="@Request.QueryString["baslangicTarihi"]"
+                           class="form-control" />
+
+                </div>
+            </div>
+
+            <div class="col-md-2 col-sm-6">
+                <div class="form-group">
+
+                    <label>Bitiş Tarihi</label>
+
+                    <input type="date"
+                           name="bitisTarihi"
+                           value="@Request.QueryString["bitisTarihi"]"
+                           class="form-control" />
+
+                </div>
+            </div>
+
+            <div class="col-md-1 col-sm-6">
+                <div class="filter-actions">
+
+                    <button type="submit"
+                            class="btn btn-primary"
+                            title="Ara">
+                        🔍
+                        Ara
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-12">
+
+                <a href="@Url.Action("Index", "Asi")"
+                   class="btn btn-default">
+
+                    <span class="glyphicon glyphicon-refresh"></span>
+                    Filtreleri Temizle
+                </a>
+
+            </div>
+
+        </div>
+    }
+
+</div>
+
+<div class="table-card">
+
+    <div class="table-responsive">
+
+        <table class="table table-hover asi-table">
+
+            <thead>
+                <tr>
+                    <th>Küpe No</th>
+                    <th>İşletme</th>
+                    <th>Aşı Adı</th>
+                    <th>Aşı Tarihi</th>
+                    <th>Sonraki Aşı</th>
+                    <th>Plan Durumu</th>
+                    <th>Açıklama</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var asi in Model)
+                    {
+                        var planDurumu = "Planlanmadı";
+                        var planClass = "status-empty";
+
+                        if (asi.SonrakiAsiTarihi.HasValue)
+                        {
+                            var kalanGun = (asi.SonrakiAsiTarihi.Value.Date - DateTime.Today).Days;
+
+                            if (kalanGun < 0)
+                            {
+                                planDurumu = "Gecikti";
+                                planClass = "status-late";
+                            }
+                            else if (kalanGun <= 7)
+                            {
+                                planDurumu = "Yaklaşıyor";
+                                planClass = "status-soon";
+                            }
+                            else
+                            {
+                                planDurumu = "Planlandı";
+                                planClass = "status-planned";
+                            }
+                        }
+
+                        <tr>
+
+                            <td>
+                                @if (asi.Hayvan != null)
+                                {
+                                    <strong>@asi.Hayvan.KupeNo</strong>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Hayvan bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                @if (asi.Hayvan != null &&
+                                     asi.Hayvan.Isletme != null)
+                                {
+                                    @asi.Hayvan.Isletme.IsletmeAdi
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        İşletme bulunamadı
+                                    </span>
+                                }
+                            </td>
+
+                            <td>@asi.AsiAdi</td>
+
+                            <td>
+                                @asi.AsiTarihi.ToString("dd.MM.yyyy")
+                            </td>
+
+                            <td>
+                                @if (asi.SonrakiAsiTarihi.HasValue)
+                                {
+                                    @asi.SonrakiAsiTarihi.Value.ToString("dd.MM.yyyy")
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Belirtilmedi
+                                    </span>
+                                }
+                            </td>
+
+                            <td>
+                                <span class="status-label @planClass">
+                                    @planDurumu
+                                </span>
+                            </td>
+
+                            <td class="description-cell"
+                                title="@asi.Aciklama">
+
+                                @if (!string.IsNullOrWhiteSpace(asi.Aciklama))
+                                {
+                                    @asi.Aciklama
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Açıklama yok
+                                    </span>
+                                }
+                            </td>
+
+                            <td class="action-cell">
+
+                                <button type="button"
+                                        class="btn btn-info btn-sm action-button btn-detay"
+                                        title="Detay"
+                                        data-id="@asi.Id"
+                                        data-kupeno="@(asi.Hayvan != null
+                                            ? asi.Hayvan.KupeNo
+                                            : "Hayvan bulunamadı")"
+                                        data-isletme="@(asi.Hayvan != null && asi.Hayvan.Isletme != null
+                                            ? asi.Hayvan.Isletme.IsletmeAdi
+                                            : "İşletme bulunamadı")"
+                                        data-asiadi="@asi.AsiAdi"
+                                        data-asitarihi="@asi.AsiTarihi.ToString("dd.MM.yyyy")"
+                                        data-sonrakiasitarihi="@(asi.SonrakiAsiTarihi.HasValue
+                                            ? asi.SonrakiAsiTarihi.Value.ToString("dd.MM.yyyy")
+                                            : "Belirtilmedi")"
+                                        data-aciklama="@(string.IsNullOrWhiteSpace(asi.Aciklama)
+                                            ? "Açıklama yok"
+                                            : asi.Aciklama)"
+                                        data-kayittarihi="@asi.KayitTarihi.ToString("dd.MM.yyyy HH:mm")">
+                                    👁
+                                    <span class="glyphicon glyphicon-eye-open"></span>
+                                </button>
+
+                                <a href="@Url.Action(
+                                             "Edit",
+                                             "Asi",
+                                             new { id = asi.Id })"
+                                   class="btn btn-warning btn-sm action-button"
+                                   title="Güncelle">
+                                    ✏️
+                                    <span class="glyphicon glyphicon-pencil"></span>
+                                </a>
+
+                                <a href="@Url.Action(
+                                             "Delete",
+                                             "Asi",
+                                             new { id = asi.Id })"
+                                   class="btn btn-danger btn-sm action-button"
+                                   title="Sil"
+                                   onclick="return confirm('Bu aşı kaydını silmek istediğinize emin misiniz?');">
+                                    🗑
+                                    <span class="glyphicon glyphicon-trash"></span>
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8"
+                            class="empty-message">
+
+                            <span class="glyphicon glyphicon-info-sign"></span>
+                            Henüz aşı kaydı bulunmuyor.
+                        </td>
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<div class="modal fade"
+     id="asiDetayModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="asiDetayBaslik">
+
+    <div class="modal-dialog"
+         role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <button type="button"
+                        class="close"
+                        data-dismiss="modal"
+                        aria-label="Kapat">
+
+                    <span aria-hidden="true">
+                        &times;
+                    </span>
+                </button>
+
+                <h4 class="modal-title"
+                    id="asiDetayBaslik">
+
+                    <span class="glyphicon glyphicon-info-sign"></span>
+                    Aşı Detayı
+                </h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table table-bordered modal-detail-table">
+
+                    <tbody>
+
+                        <tr>
+                            <th>Id</th>
+                            <td id="detayId"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Küpe Numarası</th>
+                            <td id="detayKupeNo"></td>
+                        </tr>
+
+                        <tr>
+                            <th>İşletme</th>
+                            <td id="detayIsletme"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Aşı Adı</th>
+                            <td id="detayAsiAdi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Aşı Tarihi</th>
+                            <td id="detayAsiTarihi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Sonraki Aşı Tarihi</th>
+                            <td id="detaySonrakiAsiTarihi"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Açıklama</th>
+                            <td id="detayAciklama"></td>
+                        </tr>
+
+                        <tr>
+                            <th>Kayıt Tarihi</th>
+                            <td id="detayKayitTarihi"></td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-default"
+                        data-dismiss="modal">
+
+                    Kapat
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+
+            $(".btn-detay").click(function () {
+
+                var buton = $(this);
+
+                $("#detayId").text(buton.attr("data-id"));
+                $("#detayKupeNo").text(buton.attr("data-kupeno"));
+                $("#detayIsletme").text(buton.attr("data-isletme"));
+                $("#detayAsiAdi").text(buton.attr("data-asiadi"));
+                $("#detayAsiTarihi").text(buton.attr("data-asitarihi"));
+                $("#detaySonrakiAsiTarihi").text(
+                    buton.attr("data-sonrakiasitarihi")
+                );
+                $("#detayAciklama").text(buton.attr("data-aciklama"));
+                $("#detayKayitTarihi").text(
+                    buton.attr("data-kayittarihi")
+                );
+
+                $("#asiDetayModal").modal("show");
+            });
+
+        });
+    </script>
+}

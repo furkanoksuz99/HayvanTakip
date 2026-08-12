@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.props" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{508E8765-CBE6-4EB6-9013-02F8C6F61FC5}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HayvanTakip.DataAccess</RootNamespace>
+    <AssemblyName>HayvanTakip.DataAccess</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.4.4\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class1.cs" />
+    <Compile Include="Context\HayvanTakipContext.cs" />
+    <Compile Include="Migrations\202608031817469_IlkKurulum.cs" />
+    <Compile Include="Migrations\202608031817469_IlkKurulum.Designer.cs">
+      <DependentUpon>202608031817469_IlkKurulum.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608051212328_HayvanTablosuEklendi.cs" />
+    <Compile Include="Migrations\202608051212328_HayvanTablosuEklendi.Designer.cs">
+      <DependentUpon>202608051212328_HayvanTablosuEklendi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608061146280_AsiTablosuEklendi.cs" />
+    <Compile Include="Migrations\202608061146280_AsiTablosuEklendi.Designer.cs">
+      <DependentUpon>202608061146280_AsiTablosuEklendi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608061401323_HastalikVeTedaviTablolariEklendi.cs" />
+    <Compile Include="Migrations\202608061401323_HastalikVeTedaviTablolariEklendi.Designer.cs">
+      <DependentUpon>202608061401323_HastalikVeTedaviTablolariEklendi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202608121858015_HareketTablosuEklendi.cs" />
+    <Compile Include="Migrations\202608121858015_HareketTablosuEklendi.Designer.cs">
+      <DependentUpon>202608121858015_HareketTablosuEklendi.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repositories\AsiRepository.cs" />
+    <Compile Include="Repositories\HareketRepository.cs" />
+    <Compile Include="Repositories\HastalikRepository.cs" />
+    <Compile Include="Repositories\HayvanRepository.cs" />
+    <Compile Include="Repositories\IsletmeRepository.cs" />
+    <Compile Include="Repositories\TedaviRepository.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\HayvanTakip.Entities\HayvanTakip.Entities.csproj">
+      <Project>{09820b98-cf5f-4934-b84f-24e788813ea5}</Project>
+      <Name>HayvanTakip.Entities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\202608031817469_IlkKurulum.resx">
+      <DependentUpon>202608031817469_IlkKurulum.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608051212328_HayvanTablosuEklendi.resx">
+      <DependentUpon>202608051212328_HayvanTablosuEklendi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608061146280_AsiTablosuEklendi.resx">
+      <DependentUpon>202608061146280_AsiTablosuEklendi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608061401323_HastalikVeTedaviTablolariEklendi.resx">
+      <DependentUpon>202608061401323_HastalikVeTedaviTablolariEklendi.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202608121858015_HareketTablosuEklendi.resx">
+      <DependentUpon>202608121858015_HareketTablosuEklendi.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Bu proje bu bilgisayarda olmayan NuGet paketlerine başvuru yapıyor. Bunları indirmek için NuGet Paket Geri Yükleme'yi kullanın. Daha fazla bilgi için, bkz. http://go.microsoft.com/fwlink/?LinkID=322105. Eksik dosya: {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.props'))" />
+    <Error Condition="!Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\EntityFramework.6.4.4\build\EntityFramework.targets'))" />
+  </Target>
+  <Import Project="..\packages\EntityFramework.6.4.4\build\EntityFramework.targets" Condition="Exists('..\packages\EntityFramework.6.4.4\build\EntityFramework.targets')" />
+</Project>

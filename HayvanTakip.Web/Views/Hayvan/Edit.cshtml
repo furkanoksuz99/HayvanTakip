@@ -1,0 +1,150 @@
+﻿@model HayvanTakip.Entities.Hayvan
+
+@{
+    ViewBag.Title = "Hayvan Güncelle";
+}
+
+<h2>Hayvan Güncelle</h2>
+
+@using (Html.BeginForm("Edit", "Hayvan", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(x => x.Id)
+    @Html.HiddenFor(x => x.KayitTarihi)
+
+    @Html.ValidationSummary(
+            false,
+            "",
+            new { @class = "text-danger" }
+        )
+
+    <div class="form-group">
+        <label>Küpe Numarası</label>
+
+        @Html.TextBoxFor(
+             x => x.KupeNo,
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.KupeNo,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>İşletme</label>
+
+        @Html.DropDownListFor(
+             x => x.IsletmeId,
+             ViewBag.Isletmeler as SelectList,
+             "İşletme seçiniz",
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.IsletmeId,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>Tür</label>
+
+        @Html.TextBoxFor(
+             x => x.Tur,
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.Tur,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>Irk</label>
+
+        @Html.TextBoxFor(
+             x => x.Irk,
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.Irk,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>Cinsiyet</label>
+
+        @Html.EnumDropDownListFor(
+             x => x.Cinsiyet,
+             "Cinsiyet seçiniz",
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.Cinsiyet,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>Doğum Tarihi</label>
+
+        @Html.TextBoxFor(
+             x => x.DogumTarihi,
+             "{0:yyyy-MM-dd}",
+             new
+             {
+                 @class = "form-control",
+                 type = "date"
+             }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.DogumTarihi,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <div class="form-group">
+        <label>Durum</label>
+
+        @Html.EnumDropDownListFor(
+             x => x.Durum,
+             "Durum seçiniz",
+             new { @class = "form-control" }
+         )
+
+        @Html.ValidationMessageFor(
+             x => x.Durum,
+             "",
+             new { @class = "text-danger" }
+         )
+    </div>
+
+    <br />
+    <br />
+
+    <button type="submit" class="btn btn-success">
+        <span class="glyphicon glyphicon-floppy-disk"></span>
+        Güncelle
+    </button>
+
+    @Html.ActionLink(
+            "Listeye Dön",
+            "Index",
+            "Hayvan",
+            null,
+            new { @class = "btn btn-default" }
+        )
+}

@@ -1,0 +1,220 @@
+﻿@model HayvanTakip.Entities.Hastalik
+
+@{
+    ViewBag.Title = "Hastalık Güncelle";
+}
+
+<style>
+    .form-card {
+        max-width: 760px;
+        margin: 25px auto;
+        padding: 25px;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-title {
+        margin-top: 0;
+        margin-bottom: 6px;
+        color: #263238;
+        font-size: 26px;
+        font-weight: 600;
+    }
+
+    .form-description {
+        margin-bottom: 22px;
+        color: #78909c;
+    }
+
+    .form-card label {
+        color: #455a64;
+        font-weight: 600;
+    }
+
+    .form-actions {
+        margin-top: 22px;
+    }
+
+        .form-actions .btn {
+            margin-right: 6px;
+            padding: 9px 16px;
+        }
+
+    .required-mark {
+        color: #d9534f;
+    }
+</style>
+
+<div class="form-card">
+
+    <h2 class="form-title">
+        Hastalık Kaydı Güncelle
+    </h2>
+
+    <p class="form-description">
+        Hastalık kaydına ait bilgileri düzenleyebilirsiniz.
+    </p>
+
+    @using (Html.BeginForm("Edit", "Hastalik", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(x => x.Id)
+        @Html.HiddenFor(x => x.KayitTarihi)
+
+        @Html.ValidationSummary(
+            false,
+            "",
+            new { @class = "alert alert-danger" }
+        )
+
+        <div class="form-group">
+
+            <label>
+                Hayvan
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.DropDownListFor(
+                x => x.HayvanId,
+                ViewBag.Hayvanlar as SelectList,
+                "Hayvan seçiniz",
+                new { @class = "form-control" }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.HayvanId,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Hastalık Adı
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.TextBoxFor(
+                x => x.HastalikAdi,
+                new
+                {
+                    @class = "form-control",
+                    placeholder = "Örn: Solunum Yolu Enfeksiyonu"
+                }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.HastalikAdi,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="form-group">
+
+            <label>
+                Teşhis Tarihi
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.TextBoxFor(
+                x => x.TeshisTarihi,
+                "{0:yyyy-MM-dd}",
+                new
+                {
+                    @class = "form-control",
+                    type = "date"
+                }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.TeshisTarihi,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Belirtiler</label>
+
+            @Html.TextAreaFor(
+                x => x.Belirtiler,
+                new
+                {
+                    @class = "form-control",
+                    rows = "4",
+                    placeholder = "Örn: Öksürük, iştahsızlık, ateş"
+                }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.Belirtiler,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="form-group">
+
+            <label>Açıklama</label>
+
+            @Html.TextAreaFor(
+                x => x.Aciklama,
+                new
+                {
+                    @class = "form-control",
+                    rows = "4",
+                    placeholder = "Hastalık hakkında açıklama giriniz."
+                }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.Aciklama,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="form-group">
+
+            <div class="checkbox">
+
+                <label>
+                    @Html.CheckBoxFor(x => x.DevamEdiyorMu)
+                    Hastalık devam ediyor
+                </label>
+
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="btn btn-success">
+
+                <span class="glyphicon glyphicon-floppy-disk"></span>
+                Güncelle
+            </button>
+
+            <a href="@Url.Action("Index", "Hastalik")"
+               class="btn btn-default">
+
+                <span class="glyphicon glyphicon-arrow-left"></span>
+                Listeye Dön
+            </a>
+
+        </div>
+    }
+
+</div>

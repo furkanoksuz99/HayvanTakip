@@ -1,0 +1,255 @@
+﻿@model HayvanTakip.Entities.Hareket
+
+@{
+    ViewBag.Title = "Hareket Güncelle";
+}
+
+<style>
+    .form-card {
+        max-width: 800px;
+        margin: 25px auto;
+        padding: 25px;
+        background-color: #ffffff;
+        border: 1px solid #dfe5e9;
+        border-radius: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .form-title {
+        margin-top: 0;
+        margin-bottom: 6px;
+        color: #263238;
+        font-size: 26px;
+        font-weight: 600;
+    }
+
+    .form-description {
+        margin-bottom: 22px;
+        color: #78909c;
+    }
+
+    .form-card label {
+        color: #455a64;
+        font-weight: 600;
+    }
+
+    .required-mark {
+        color: #d9534f;
+    }
+
+    .form-actions {
+        margin-top: 22px;
+    }
+
+        .form-actions .btn {
+            margin-right: 6px;
+            padding: 9px 16px;
+        }
+
+    .help-text {
+        margin-top: 5px;
+        color: #90a4ae;
+        font-size: 12px;
+    }
+</style>
+
+<div class="form-card">
+
+    <h2 class="form-title">
+        ✏️ Hareket Kaydı Güncelle
+    </h2>
+
+    <p class="form-description">
+        Hayvan hareketine ait bilgileri düzenleyebilirsiniz.
+    </p>
+
+    @using (Html.BeginForm("Edit", "Hareket", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+
+        @Html.HiddenFor(x => x.Id)
+
+        @Html.ValidationSummary(
+            false,
+            "",
+            new { @class = "alert alert-danger" }
+        )
+
+        <!-- HAYVAN -->
+
+        <div class="form-group">
+
+            <label>
+                Hayvan
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.DropDownListFor(
+                x => x.HayvanId,
+                ViewBag.Hayvanlar as SelectList,
+                "Hayvan seçiniz",
+                new { @class = "form-control" }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.HayvanId,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <!-- HAREKET TİPİ -->
+
+        <div class="form-group">
+
+            <label>
+                Hareket Tipi
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.EnumDropDownListFor(
+                x => x.HareketTipi,
+                "Hareket tipi seçiniz",
+                new { @class = "form-control" }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.HareketTipi,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <div class="row">
+
+            <!-- KAYNAK -->
+
+            <div class="col-md-6">
+
+                <div class="form-group">
+
+                    <label>
+                        Kaynak İşletme
+                    </label>
+
+                    @Html.DropDownListFor(
+                        x => x.KaynakIsletmeId,
+                        ViewBag.KaynakIsletmeler as SelectList,
+                        "Kaynak işletme seçiniz",
+                        new { @class = "form-control" }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        x => x.KaynakIsletmeId,
+                        "",
+                        new { @class = "text-danger" }
+                    )
+
+                </div>
+
+            </div>
+
+            <!-- HEDEF -->
+
+            <div class="col-md-6">
+
+                <div class="form-group">
+
+                    <label>
+                        Hedef İşletme
+                    </label>
+
+                    @Html.DropDownListFor(
+                        x => x.HedefIsletmeId,
+                        ViewBag.HedefIsletmeler as SelectList,
+                        "Hedef işletme seçiniz",
+                        new { @class = "form-control" }
+                    )
+
+                    @Html.ValidationMessageFor(
+                        x => x.HedefIsletmeId,
+                        "",
+                        new { @class = "text-danger" }
+                    )
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="help-text">
+            Kaynak ve hedef işletme aynı olamaz.
+        </div>
+
+        <br />
+
+        <!-- TARİH -->
+
+        <div class="form-group">
+
+            <label>
+                Hareket Tarihi
+                <span class="required-mark">*</span>
+            </label>
+
+            @Html.TextBoxFor(
+                x => x.HareketTarihi,
+                "{0:yyyy-MM-dd}",
+                new
+                {
+                    @class = "form-control",
+                    type = "date"
+                }
+            )
+
+            @Html.ValidationMessageFor(
+                x => x.HareketTarihi,
+                "",
+                new { @class = "text-danger" }
+            )
+
+        </div>
+
+        <!-- AÇIKLAMA -->
+
+        <div class="form-group">
+
+            <label>
+                Açıklama
+            </label>
+
+            @Html.TextAreaFor(
+                x => x.Aciklama,
+                new
+                {
+                    @class = "form-control",
+                    rows = "4",
+                    placeholder = "Hareket hakkında açıklama giriniz..."
+                }
+            )
+
+        </div>
+
+        <!-- BUTONLAR -->
+
+        <div class="form-actions">
+
+            <button type="submit"
+                    class="btn btn-success">
+
+                💾 Güncelle
+            </button>
+
+            <a href="@Url.Action("Index", "Hareket")"
+               class="btn btn-default">
+
+                ⬅️ Listeye Dön
+            </a>
+
+        </div>
+    }
+
+</div>

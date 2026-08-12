@@ -1,0 +1,54 @@
+﻿@model HayvanTakip.Entities.Isletme
+
+@{
+    ViewBag.Title = "Yeni İşletme";
+}
+
+<h2>Yeni İşletme</h2>
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <div class="form-group">
+        <label>İşletme Numarası</label>
+        @Html.TextBoxFor(x => x.IsletmeNo, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>İşletme Adı</label>
+        @Html.TextBoxFor(x => x.IsletmeAdi, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>İl Kodu</label>
+        @Html.TextBoxFor(x => x.IlKodu, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>İlçe Kodu</label>
+        @Html.TextBoxFor(x => x.IlceKodu, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Adres</label>
+        @Html.TextAreaFor(x => x.Adres, new { @class = "form-control", rows = "4" })
+    </div>
+
+    <div class="form-group">
+        <label>Yetkili TCKN</label>
+        @Html.TextBoxFor(x => x.YetkiliTckn, new { @class = "form-control" })
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success">
+        Kaydet
+    </button>
+
+    @Html.ActionLink("Listeye Dön", "Index", null, new { @class = "btn btn-default" })
+}

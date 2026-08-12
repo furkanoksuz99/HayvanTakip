@@ -1,0 +1,311 @@
+﻿@{
+    var controller = ViewContext.RouteData.Values["controller"] != null
+        ? ViewContext.RouteData.Values["controller"].ToString()
+        : "";
+}
+
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+    <meta charset="utf-8" />
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>
+        @ViewBag.Title - Hayvan Takip Sistemi
+    </title>
+
+    <link href="@Url.Content("~/Content/bootstrap.css")"
+          rel="stylesheet"
+          type="text/css" />
+
+    <link href="@Url.Content("~/Content/site.css")"
+          rel="stylesheet"
+          type="text/css" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f5f7fa;
+            color: #37474f;
+        }
+
+        .top-menu {
+            width: 100%;
+            min-height: 64px;
+            background-color: #263238;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.20);
+        }
+
+        .top-menu-container {
+            width: 1170px;
+            max-width: calc(100% - 30px);
+            min-height: 64px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+        }
+
+        .brand-link {
+            display: inline-block;
+            margin-right: 30px;
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+            .brand-link:hover,
+            .brand-link:focus {
+                color: #ffffff;
+                text-decoration: none;
+            }
+
+            .brand-link .glyphicon {
+                margin-right: 7px;
+                color: #81c784;
+            }
+
+        .menu-links {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+            .menu-links > li {
+                margin: 0;
+                padding: 0;
+            }
+
+                .menu-links > li > a {
+                    display: block;
+                    min-height: 64px;
+                    padding: 21px 15px;
+                    color: #cfd8dc;
+                    text-decoration: none;
+                    font-weight: 500;
+                    white-space: nowrap;
+                }
+
+                    .menu-links > li > a:hover,
+                    .menu-links > li > a:focus {
+                        color: #ffffff;
+                        background-color: #37474f;
+                        text-decoration: none;
+                    }
+
+                .menu-links > li.active > a {
+                    color: #ffffff;
+                    background-color: #337ab7;
+                }
+
+                .menu-links > li.disabled > a {
+                    color: #78909c;
+                    cursor: not-allowed;
+                }
+
+                    .menu-links > li.disabled > a:hover {
+                        color: #78909c;
+                        background-color: transparent;
+                    }
+
+            .menu-links .glyphicon {
+                margin-right: 6px;
+            }
+
+        .user-menu {
+            margin-left: auto;
+        }
+
+        .body-content {
+            min-height: calc(100vh - 140px);
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+
+        .app-footer {
+            padding: 20px 0;
+            color: #78909c;
+            background-color: #ffffff;
+            border-top: 1px solid #dfe5e9;
+        }
+
+            .app-footer p {
+                margin: 0;
+            }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        @@media (max-width: 991px) {
+            .top-menu-container {
+                display: block;
+                padding-top: 15px;
+                padding-bottom: 15px;
+            }
+
+            .brand-link {
+                display: block;
+                margin-right: 0;
+                margin-bottom: 12px;
+            }
+
+            .menu-links {
+                display: flex;
+                flex-wrap: wrap;
+            }
+
+                .menu-links > li > a {
+                    min-height: auto;
+                    padding: 10px 12px;
+                    border-radius: 4px;
+                }
+
+            .user-menu {
+                margin-left: 0;
+            }
+        }
+
+        @@media (max-width: 600px) {
+            .menu-links {
+                display: block;
+            }
+
+                .menu-links > li > a {
+                    width: 100%;
+                }
+
+            .footer-right {
+                margin-top: 8px;
+                text-align: left;
+            }
+        }
+    </style>
+
+    @RenderSection("styles", required: false)
+</head>
+
+<body>
+
+    <header class="top-menu">
+        <div class="top-menu-container">
+
+            <a href="@Url.Action("Index", "Home")"
+               class="brand-link">
+
+                <span class="glyphicon glyphicon-leaf"></span>
+                Hayvan Takip
+            </a>
+
+            <ul class="menu-links">
+
+                <li class="@(controller == "Home" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Home")">
+                        <span class="glyphicon glyphicon-home"></span>
+                        Ana Sayfa
+                    </a>
+                </li>
+
+                <li class="@(controller == "Isletme" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Isletme")">
+                        <span class="glyphicon glyphicon-briefcase"></span>
+                        İşletmeler
+                    </a>
+                </li>
+
+                <li class="@(controller == "Hayvan" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Hayvan")">
+                        <span class="glyphicon glyphicon-tags"></span>
+                        Hayvanlar
+                    </a>
+                </li>
+
+                <li class="@(controller == "Asi" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Asi")">
+                        <span class="glyphicon glyphicon-tint"></span>
+                        Aşı Takibi
+                    </a>
+                </li>
+
+                <li class="@(controller == "Hastalik" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Hastalik")">
+                        Hastalıklar
+                    </a>
+                </li>
+
+                <li class="@(controller == "Tedavi" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Tedavi")">
+                        <span class="glyphicon glyphicon-plus-sign"></span>
+                        Tedaviler
+                    </a>
+                </li>
+
+                <li class="@(controller == "Hareket" ? "active" : "")">
+                    <a href="@Url.Action("Index", "Hareket")">
+                        <span class="glyphicon glyphicon-transfer"></span>
+                        Hareketler
+                    </a>
+                </li>
+
+                <li class="user-menu">
+                    <a href="javascript:void(0);">
+                        <span class="glyphicon glyphicon-user"></span>
+                        Yönetim Paneli
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+    </header>
+
+    <main class="container body-content">
+        @RenderBody()
+    </main>
+
+    <footer class="app-footer">
+        <div class="container">
+
+            <div class="row">
+
+                <div class="col-sm-6">
+                    <p>
+                        &copy; @DateTime.Now.Year Hayvan Takip Sistemi
+                    </p>
+                </div>
+
+                <div class="col-sm-6 footer-right">
+                    <p>
+                        ASP.NET MVC 5 · Entity Framework 6
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </footer>
+
+    <script src="@Url.Content("~/Scripts/jquery-3.7.1.js")"></script>
+    <script src="@Url.Content("~/Scripts/bootstrap.js")"></script>
+
+    @RenderSection("scripts", required: false)
+
+</body>
+</html>
