@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HayvanTakip.Entities", "Hay
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HayvanTakip.Web", "HayvanTakip.Web\HayvanTakip.Web.csproj", "{C15CC17E-1CDB-43C3-BA48-1EDEE05A7805}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HayvanTakip", "HayvanTakip\HayvanTakip.csproj", "{CA433075-19F3-41F2-B7D0-2873BA16F7FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -35,6 +37,10 @@ Global
 		{C15CC17E-1CDB-43C3-BA48-1EDEE05A7805}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C15CC17E-1CDB-43C3-BA48-1EDEE05A7805}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C15CC17E-1CDB-43C3-BA48-1EDEE05A7805}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA433075-19F3-41F2-B7D0-2873BA16F7FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA433075-19F3-41F2-B7D0-2873BA16F7FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA433075-19F3-41F2-B7D0-2873BA16F7FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA433075-19F3-41F2-B7D0-2873BA16F7FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 		{B216DD28-3A8F-4EDF-AE06-D9AC693DF057} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{09820B98-CF5F-4934-B84F-24E788813EA5} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{C15CC17E-1CDB-43C3-BA48-1EDEE05A7805} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{CA433075-19F3-41F2-B7D0-2873BA16F7FE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F854BBD4-8090-4FD2-9D6A-A0D2D474CF20}

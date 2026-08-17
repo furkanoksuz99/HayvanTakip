@@ -46,5 +46,7 @@ namespace HayvanTakip.Entities
         public virtual ICollection<Asi> Asilar { get; set; }
 
         public virtual ICollection<Hareket> Hareketler { get; set; }
+
+       
     }
 }
